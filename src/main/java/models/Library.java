@@ -2,6 +2,9 @@ package models;
 
 import exceptions.LibraryException;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 public class Library {
@@ -76,5 +79,17 @@ public class Library {
         }
 
         books.sort(Comparator.comparing(b -> b.title, String.CASE_INSENSITIVE_ORDER));
+    }
+
+    public void exportToTextFile(String filePath) throws IOException, LibraryException {
+        if (books.isEmpty()) {
+            throw new LibraryException("La bibliothèque est vide.");
+        }
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            for (Book book : books) {
+                writer.write(book.title + " | " + book.author + " | " + book.yearOfPublication);
+                writer.newLine();
+            }
+        }
     }
 }

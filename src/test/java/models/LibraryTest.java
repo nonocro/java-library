@@ -4,7 +4,11 @@ import exceptions.LibraryException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -178,6 +182,49 @@ class LibraryTest {
                     () -> library.findPartialByTitle("foo"),
                     "Impossible de récupérer le livre foo. Il n'existe pas dans la bibliothèque."
             );
+        }
+    }
+
+    @Nested
+    class ExportToTextFileTest {
+        @Test
+        void shouldExportBooksToTextFile() throws Exception {
+            library.addBook(book1);
+            library.addBook(book2);
+            library.addBook(book3);
+
+            Path tempFile = Files.createTempFile("books_export", ".txt");
+            String filePath = tempFile.toString();
+
+            library.exportToTextFile(filePath);
+
+            String content = Files.readString(tempFile);
+            String expected =
+                    "1984 | George Orwell | 1949\n"
+                            + "Brave New World | Aldous Huxley | 1931\n"
+                            + "Fahrenheit 451 | Ray Bradbury | 1953\n";
+
+            content = content.replace("\r\n", "\n");
+            assertEquals(expected, content);
+
+            Files.deleteIfExists(tempFile);
+        }
+
+        @Test
+        void shouldThrowIfLibraryIsEmpty() {
+            Path tempFile = null;
+            try {
+                tempFile = Files.createTempFile("books_empty_export", ".txt");
+                String filePath = tempFile.toString();
+                LibraryException ex = assertThrows(LibraryException.class, () -> library.exportToTextFile(filePath));
+                assertEquals("La bibliothèque est vide.", ex.getMessage());
+            } catch (IOException e) {
+                fail("Problème lors de la création du fichier temporaire");
+            } finally {
+                if (tempFile != null) {
+                    try { Files.deleteIfExists(tempFile); } catch (IOException e) { /* Ignorer */ }
+                }
+            }
         }
     }
 }
