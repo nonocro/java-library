@@ -2,6 +2,8 @@
 
 Ce projet est un exemple de gestion de bibliothèque en Java, utilisant Maven et JUnit 5 pour les tests.
 
+[![Java CI with Maven](https://github.com/nonocro/java-library/actions/workflows/main.yml/badge.svg?branch=main&event=push)](https://github.com/nonocro/java-library/actions/workflows/main.yml)
+
 ---
 
 ## Prérequis
